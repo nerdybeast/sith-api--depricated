@@ -39,3 +39,6 @@ node_modules
 # Visual Studio Code settings
 typings
 .vscode
+
+# Environment settings
+.env
