@@ -1,6 +1,9 @@
+'use strict';
+
+var debug = require('debug')('api index');
 var isProd = (process.env.NODE_ENV === 'production');
 
-module.exports = function(app) {
+var RoutesCore = function(app) {
     
     app.get('/', function(req, res) {
         res.send({
@@ -12,8 +15,12 @@ module.exports = function(app) {
     
     app.use('/auth', require('./auth'));
     
-    var api = require('./api')();
-    app.use('/api', api);
+    app.use('/api/*', function(res, req, next) {
+        debug('Hit /api middleware.');
+        next();
+    });
+    
+    app.use('/api/classes', require('./api/classes'));
     
     //Catch a 404 (request that didn't match a route defined above) and pass it down below to an error handler.
     //NOTE: Errors thrown in above routes will not be caught here because this function does not accept an error parameter.
@@ -27,11 +34,11 @@ module.exports = function(app) {
     //This function will only catch errors if it has 4 parameters, see:
     //http://expressjs.com/en/guide/error-handling.html
     app.use(function(err, req, res, next) {
-        
+
         var status = err.statusCode || 500;
-        
+
         return res.status(status).send({ 
-            message: err.message, 
+            message: err.message,
             //Prevent leaking stack trace info in Prod.
             //stackTrace: (isProd ? null : err.stack),
             stackTrace: err.stack,
@@ -40,3 +47,5 @@ module.exports = function(app) {
         });
     });
 }
+
+module.exports = RoutesCore;

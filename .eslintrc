@@ -1,0 +1,7 @@
+//http://eslint.org/docs/user-guide/configuring
+{
+    "env": {
+        //Enable es6 features to be linted by eslint. This file doesn't enable es6 features, it simply gives code-assist while developing it.
+        "es6": true
+    }
+}

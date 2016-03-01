@@ -40,5 +40,8 @@ node_modules
 typings
 .vscode
 
+# Webstorm settings
+.idea
+
 # Environment settings
 .env

@@ -80,7 +80,7 @@ router.route('/').post(function(req, res, next) {
     });
     
 }).all(function(req, res, next) {
-    next(new Error('"' + req.method + '" not supported at ' + req.originalUrl));
+    next(new Error(`${req.method} not supported at ${req.originalUrl}`));
 });
 
 module.exports = router;
