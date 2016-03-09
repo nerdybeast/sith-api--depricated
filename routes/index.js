@@ -1,9 +1,15 @@
 'use strict';
 
+var jwt = require('express-jwt');
 var debug = require('debug')('api index');
 var isProd = (process.env.NODE_ENV === 'production');
 
 var RoutesCore = function(app) {
+    
+    var authenticate = jwt({
+        secret: new Buffer(process.env.AUTH0_CLIENT_SECRET, 'base64'),
+        audience: process.env.AUTH0_CLIENT_ID
+    });
     
     app.get('/', function(req, res) {
         res.send({
@@ -15,10 +21,12 @@ var RoutesCore = function(app) {
     
     app.use('/auth', require('./auth'));
     
-    app.use('/api/*', function(res, req, next) {
-        debug('Hit /api middleware.');
-        next();
-    });
+    // app.use('/api/*', function(res, req, next) {
+    //     debug('Hit /api middleware prior to jwt authentication.');
+    //     next();
+    // });
+    
+    app.use('/api', authenticate);
     
     app.use('/api/classes', require('./api/classes'));
     

@@ -9,8 +9,10 @@
   "dependencies": {
     "body-parser": "^1.15.0",
     "cookie-parser": "^1.4.1",
+    "cors": "^2.7.1",
     "ejs": "2.3.3",
     "express": "4.13.3",
+    "express-jwt": "^3.3.0",
     "jsforce": "^1.5.1",
     "lodash": "^4.5.0",
     "morgan": "^1.6.1",

@@ -6,6 +6,7 @@ var express = require('express');
 var morgan = require('morgan');
 var cookieParser = require('cookie-parser'); //middle-ware that allows easy manipulation of cookies incoming/outgoing
 var bodyParser = require('body-parser'); //middle-ware that allows easy manipulation of request/response bodies
+var cors = require('cors');
 
 var app = express();
 
@@ -15,6 +16,7 @@ app.use(morgan('dev'));
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cors());
 
 //Automatically loads routes/index.js, see:
 //https://nodejs.org/api/modules.html#modules_folders_as_modules
