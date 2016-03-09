@@ -26,6 +26,8 @@ var RoutesCore = function(app) {
     //     next();
     // });
     
+    app.use('/analytics', require('./analytics'));
+    
     app.use('/api', authenticate);
     
     app.use('/api/classes', require('./api/classes'));
