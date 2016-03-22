@@ -18,6 +18,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 
+
 //Automatically loads routes/index.js, see:
 //https://nodejs.org/api/modules.html#modules_folders_as_modules
 require('./routes')(app);
