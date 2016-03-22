@@ -4,7 +4,8 @@
   "description": "RESTful node.js service backing our Sith app.",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "echo 'I should probably test something one of these days...'"
   },
   "dependencies": {
     "body-parser": "^1.15.0",
