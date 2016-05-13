@@ -27,6 +27,7 @@ var RoutesCore = function(app) {
     // });
     
     app.use('/analytics', require('./analytics'));
+    app.use('/services', require('./org-services'));
     
     //Authenticate all requests to /api*
     app.use('/api', authenticate);
