@@ -28,6 +28,7 @@ var RoutesCore = function(app) {
     
     app.use('/analytics', require('./analytics'));
     
+    //Authenticate all requests to /api*
     app.use('/api', authenticate);
     
     app.use('/api/classes', require('./api/classes'));
