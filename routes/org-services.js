@@ -1,14 +1,14 @@
 'use strict';
 
-var jsforce = require('jsforce');
-var express = require('express');
-var _ = require('lodash');
-var request = require('request');
-var serializer = require('jsonapi-serializer').Serializer;
+let express = require('express');
+let _ = require('lodash');
+let request = require('request');
+let serializer = require('jsonapi-serializer').Serializer;
+let routeErrorHandler = require('../lib/route-error-handler');
 
-var router = express.Router();
+let router = express.Router();
 
-var ServicesDataSerializer = new serializer('org-api-versions', {
+let ServicesDataSerializer = new serializer('org-api-versions', {
     attributes: ['label', 'url', 'version']
 });
 
@@ -39,8 +39,6 @@ router.route('/org-api-versions').get(function(req, res, next) {
         
     });
     
-}).all(function(req, res, next) {
-    next(new Error(`${req.method} not supported at ${req.originalUrl}`));
-});
+}).all(routeErrorHandler);
 
 module.exports = router;
