@@ -33,6 +33,7 @@ var RoutesCore = function(app) {
     app.use('/api', authenticate);
     
     app.use('/api/classes', require('./api/classes'));
+    app.use('/api/run-tests', require('./api/execute-test-run'));
     
     //Catch a 404 (request that didn't match a route defined above) and pass it down below to an error handler.
     //NOTE: Errors thrown in above routes will not be caught here because this function does not accept an error parameter.
