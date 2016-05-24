@@ -24,12 +24,14 @@ router.route('/').post(function(req, res, next) {
     
     let classIds = req.body.data.classIds || [];
     let userId = req.body.data.userId;
+    let acceptsJsonApi = req.headers.acceptsJsonApi;
     
+    //TODO: need to see if creating a new traceflag here is going to interupt a test that is currently running.
+    //If so, we will need to check for that before creating the new traceflag.
     return jExt.createTraceFlag(userId).then(function(result) {
       
-        //Creates an "AsyncApexJob" record in Salesforce, we are given back just the id.
-        //return jExt.conn.tooling.runTestsAsynchronous(classIds);
-        
+        console.log('SITH => create trace flag:', result);
+      
         return jExt.triggerAsyncTestRun(classIds);
         
     }).then(function(result) {
@@ -48,7 +50,8 @@ router.route('/').post(function(req, res, next) {
         
         let jsonApiData = RunTestAsyncSerializer.serialize(result.records);
         
-        return res.send(jsonApiData);
+        let data = acceptsJsonApi ? jsonApiData : result.records;
+        return res.send(data);
         
     }).catch(function(error) {
         var exception = new Error(error.message);

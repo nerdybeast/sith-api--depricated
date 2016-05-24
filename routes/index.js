@@ -19,18 +19,46 @@ var RoutesCore = function(app) {
         });
     });
     
-    app.use('/auth', require('./auth'));
+    //app.use('/auth', require('./auth'));
     
     // app.use('/api/*', function(res, req, next) {
     //     debug('Hit /api middleware prior to jwt authentication.');
     //     next();
     // });
     
+    app.use(function(req, res, next) {
+        
+        const jsonMimeType = 'application/json';
+        const jsonApiMimeType = 'application/vnd.api+json';
+        
+        //These variables will return a string if the "Accept" header contains one of the above supported media types
+        //otherwise, they will return false.
+        let acceptsJson = req.accepts(jsonMimeType);
+        let acceptsJsonApi = req.accepts(jsonApiMimeType);
+        
+        if(!acceptsJson && !acceptsJsonApi) {
+            var err = new Error(`All requests to this api must specify an "Accept" header with a value of either "${jsonApiMimeType}" or "${jsonMimeType}"`);
+            err.type = 'UNSUPPORTED_MEDIA_TYPE';
+            err.statusCode = 415;
+            return next(err);
+        }
+        
+        //Let's see if the incoming request is asking for a json api doc to be returned. Tacking on an additional
+        //header so that we can determine what type of content to return.
+        //See: http://expressjs.com/en/api.html#req.accepts
+        req.headers.acceptsJsonApi = (acceptsJsonApi && acceptsJsonApi !== false);
+        
+        return next();
+    });
+    
     app.use('/analytics', require('./analytics'));
     app.use('/services', require('./org-services'));
     
     //Authenticate all requests to /api*
     app.use('/api', authenticate);
+    
+    //TODO: Need to account for the "Content-Type" passed, we only want to serve up a json api doc if "application/vnd.api+json"
+    //is given. If not that, then serve up traditional json.
     
     app.use('/api/classes', require('./api/classes'));
     app.use('/api/run-tests', require('./api/execute-test-run'));

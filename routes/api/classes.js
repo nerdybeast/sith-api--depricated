@@ -62,45 +62,6 @@ router.use(function(req, res, next) {
         next();
     });
     
-    // //Our jsForce extension class exposes the original jsForce library via ".conn"
-    // jExt.conn.describe('ApexClass').then(function(meta) {
-        
-    //     //This is running a describe on the whole ApexClass class but we simply want just the field names.
-    //     let allFieldNames = _.map(meta.fields, 'name');
-        
-    //     //Let's remove the body fields because they will contain the entire contents of the class which will make our response huge.
-    //     fieldNames = _.without(allFieldNames, 'Body', 'BodyCrc');
-        
-    //     /**
-    //      * Here we need to strip of the "Id" field so that it doesn't end up in the "attributes" section of the json api document.
-    //      * The id will automatically be added one node up from the "attributes" which is where we want it, example:
-    //      * {
-    //      *   "data": [
-    //      *     {
-    //      *       id: "01pG0000004GSM7IAO",
-    //      *       type: "classes",
-    //      *       attributes: {
-    //      *         name: "AccountCreationBL",
-    //      *         //...
-    //      *         //We dont want the "id" to end up in this object as well.
-    //      *       }
-    //      *     }
-    //      *   ]
-    //      * }
-    //      */
-    //     let jsonApiFieldNames = _.map(_.without(fieldNames, 'Id'), function(key) {
-    //         return _.camelCase(key);
-    //     });
-        
-    //     //We will be adding this additional field to the response below.
-    //     jsonApiFieldNames.push('isTestClass');
-        
-    //     ClassSerializer = new serializer('classes', {
-    //         attributes: jsonApiFieldNames
-    //     });
-        
-    //     next();
-    // });
 });
 
 router.route('/').get(function(req, res, next) {
