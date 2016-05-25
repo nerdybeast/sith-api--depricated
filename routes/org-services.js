@@ -5,6 +5,7 @@ let _ = require('lodash');
 let request = require('request');
 let serializer = require('jsonapi-serializer').Serializer;
 let routeErrorHandler = require('../lib/route-error-handler');
+let orgVersions = require('../lib/org-versions');
 
 let router = express.Router();
 
@@ -14,29 +15,13 @@ let ServicesDataSerializer = new serializer('org-api-versions', {
 
 router.route('/org-api-versions').get(function(req, res, next) {
     
-    request.get(`${req.headers.instanceurl}/services/data`, function(rErr, rRes, rStringBody) {
+    return orgVersions(req.headers.instanceurl).then((result) => {
         
-        console.info('rErr', rErr);
-        
-        if(rErr) {
-            let exception = new Error(rErr.message);
-            exception.type = rErr.errorCode;
-            exception.statusCode = 400;
-            return next(exception);
-        }
-        
-        let body = JSON.parse(rStringBody);
-        console.info('body', body);
-        
-        _.forEach(body, function(value) {
-            
-            //Let's add an "id" property for json api spec compliance
-            value.id = Number(value.version);
-        });
-        
-        let jsonApiDoc = ServicesDataSerializer.serialize(body);
+        let jsonApiDoc = ServicesDataSerializer.serialize(result);
         return res.send(jsonApiDoc);
         
+    }).catch((error) => {
+        return next(error);
     });
     
 }).all(routeErrorHandler);

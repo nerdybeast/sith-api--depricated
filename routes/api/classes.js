@@ -77,8 +77,6 @@ router.route('/').get(function(req, res, next) {
         //Create an array to hold all of the test class names.
         let testClassNames = _.map(testClasses, 'name');
         
-        console.log('testClassNames[0]', testClassNames[0]);
-        
         _.forEach(allClasses, function(record) {
             record['isTestClass'] = _.includes(testClassNames, record.name);
         });

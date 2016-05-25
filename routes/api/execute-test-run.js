@@ -40,6 +40,7 @@ router.route('/').post(function(req, res, next) {
         
         //TODO: Here we want to fire a void method that will continue monitoring the test run while this method returns immediately.
         //We will use socket.io to monitor the job and send updates.
+        jExt.getTestRunStatus(result.asyncApexJobId);
         
         console.log('runTestsAsynchronous() result =>', result);
         
