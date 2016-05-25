@@ -7,7 +7,12 @@ let JsforceExt = require('../../lib/jsforceExt');
 let serializer = require('jsonapi-serializer').Serializer;
 let routeErrorHandler = require('../../lib/route-error-handler');
 
+let Debug = require('../../lib/debug');
+let d = new Debug('CLASSES');
+
 let router = express.Router();
+
+//Will hold an instance of our extended jsforce module.
 let jExt;
 
 //Will hold the field names from our describe() call into salesforce, these names will be "CamelCased".
@@ -16,7 +21,7 @@ let fieldNames;
 //Will hold our json api serializer for the "ApexClass" class in Salesforce.
 let ClassSerializer;
 
-//This middleware function will be invoked for every request to a route contained in this file.
+//This middleware function will be invoked for every request made to a route defined in this file.
 router.use(function(req, res, next) {
     
     jExt = new JsforceExt({
@@ -29,7 +34,7 @@ router.use(function(req, res, next) {
         //Let's remove the body fields because they will contain the entire contents of the class which will make our response huge.
         fieldNames = _.without(fieldNamesResult, 'body', 'bodyCrc');
         
-        console.log('ApexClass field names =>', fieldNames);
+        d.log(`ApexClass field names => ${fieldNames.join(', ')}`);
         
         /**
          * Here we need to strip of the "id" field so that it doesn't end up in the "attributes" section of the json api document.
@@ -50,7 +55,7 @@ router.use(function(req, res, next) {
          */
         let jsonApiFieldNames = _.without(fieldNames, 'id');
         
-        console.log('jsonApiFieldNames =>', jsonApiFieldNames);
+        d.log(`jsonApiFieldNames => ${jsonApiFieldNames.join(', ')}`);
         
         //We will be adding this additional field to the response below.
         jsonApiFieldNames.push('isTestClass');
@@ -59,7 +64,7 @@ router.use(function(req, res, next) {
             attributes: jsonApiFieldNames
         });
         
-        next();
+        return next();
     });
     
 });
@@ -94,6 +99,8 @@ router.route('/').get(function(req, res, next) {
     });
     
 }).all(routeErrorHandler);
+
+//router.all('*', routeErrorHandler);
 
 // router.route('/istest').get(function(req, res, next) {
     

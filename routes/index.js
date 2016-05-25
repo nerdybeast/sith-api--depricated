@@ -4,7 +4,7 @@ var jwt = require('express-jwt');
 var debug = require('debug')('api index');
 var isProd = (process.env.NODE_ENV === 'production');
 
-var RoutesCore = function(app) {
+var RoutesCore = function(app, io) {
     
     var authenticate = jwt({
         secret: new Buffer(process.env.AUTH0_CLIENT_SECRET, 'base64'),
@@ -62,6 +62,8 @@ var RoutesCore = function(app) {
     
     app.use('/api/classes', require('./api/classes'));
     app.use('/api/run-tests', require('./api/execute-test-run'));
+    
+    //TODO: app.use('/api', ...some module that converts the response between json & jsonApi);
     
     //Catch a 404 (request that didn't match a route defined above) and pass it down below to an error handler.
     //NOTE: Errors thrown in above routes will not be caught here because this function does not accept an error parameter.
