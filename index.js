@@ -52,7 +52,14 @@ io.on('connection', (socket) => {
     //Will emit to all clients that are connected.
     io.emit('debug-from-server', { message: 'Hey everyone, there is a new client!' });
     
+    //Custom hook
     socket.on('debug-from-client', function(from, data) {
        console.log(`Received message from ${from} =>`, data);
+    });
+    
+    //Default socket.io hook
+    socket.on('disconnect', function(from, data) {
+       //TODO: Handle a client disconnecting...
+       console.log(`Client disconnected`);
     });
 });

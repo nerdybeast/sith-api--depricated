@@ -12,6 +12,11 @@ var RoutesCore = function(app, io) {
     });
     
     app.get('/', function(req, res) {
+        
+        io.emit('debug-from-server', {
+            message: '/ root of api accessed'
+        });
+        
         res.send({
             port: app.get('port'),
             env: process.env.NODE_ENV,
@@ -61,7 +66,7 @@ var RoutesCore = function(app, io) {
     //is given. If not that, then serve up traditional json.
     
     app.use('/api/classes', require('./api/classes'));
-    app.use('/api/run-tests', require('./api/execute-test-run'));
+    app.use('/api/run-tests', require('./api/execute-test-run')(io));
     
     //TODO: app.use('/api', ...some module that converts the response between json & jsonApi);
     
