@@ -30,32 +30,39 @@ module.exports = function(io) {
         
         //TODO: need to see if creating a new traceflag here is going to interupt a test that is currently running.
         //If so, we will need to check for that before creating the new traceflag.
-        return jExt.createTraceFlag(userId).then(function(result) {
+        return jExt.createTraceFlag(userId).then(result => {
         
             io.emit('debug-from-server', { traceFlag: result });
             console.log('SITH => create trace flag:', result);
         
             return jExt.triggerAsyncTestRun(classIds);
             
-        }).then(function(result) {
+        }).then(result => {
             
-            //result => 7071700000XdKTp
+            let asyncApexJob = result.asyncApexJob.records[0];
             
-            //TODO: Here we want to fire a void method that will continue monitoring the test run while this method returns immediately.
-            //We will use socket.io to monitor the job and send updates.
-            jExt.getTestRunStatus(result.asyncApexJobId);
+            //This is a void return method that will continue to monitor the test run using socket.io
+            jExt.getTestRunStatus(asyncApexJob.id);
             
-            console.log('runTestsAsynchronous() result =>', result);
+            if(acceptsJsonApi) {
+                
+                let apexTestQueueItemData = new serializer(result.apexTestQueueItem.sobjectType, { 
+                    attributes: _.without(result.apexTestQueueItem.fieldNames, 'id')  
+                }).serialize(result.apexTestQueueItem.records);
+                
+                let asyncApexJobData = new serializer(result.asyncApexJob.sobjectType, { 
+                    attributes: _.without(result.asyncApexJob.fieldNames, 'id')  
+                }).serialize(result.asyncApexJob.records);
+                
+                let combinedData = _.concat(apexTestQueueItemData.data, asyncApexJobData.data);
+                return res.send({ data: combinedData });
+                
+            }
             
-            //Must specify an empty attributes property in order for the json api doc to be generated correctly even though our response has no "attributes".
-            let RunTestAsyncSerializer = new serializer(result.sobjectType, { 
-                attributes: _.without(result.sobjectFieldNames, 'id')  
-            });
-            
-            let jsonApiData = RunTestAsyncSerializer.serialize(result.records);
-            
-            let data = acceptsJsonApi ? jsonApiData : result.records;
-            return res.send(data);
+            //Standard json response does not need to include the fieldNames array, ditch those arrays before returning.
+            delete result.apexTestQueueItem.fieldNames;
+            delete result.asyncApexJob.fieldNames;
+            return res.send(result);
             
         }).catch(function(error) {
             var exception = new Error(error.message);
