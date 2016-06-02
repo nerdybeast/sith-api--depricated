@@ -1,18 +1,19 @@
 'use strict';
 
-var express = require('express');
-var _ = require('lodash');
-var elasticsearch = require('elasticsearch');
+let express = require('express');
+let _ = require('lodash');
+let elasticsearch = require('elasticsearch');
+let routeErrorHandler = require('../lib/route-error-handler')
 
-var router = express.Router();
+let router = express.Router();
 
-var client = new elasticsearch.Client({
+let client = new elasticsearch.Client({
     host: process.env.SEARCHBOX_URL,
     log: 'trace',
     apiVersion: '2.1'
 });
 
-router.route('/ping').get(function(req, res, next) {
+router.route('/ping').get((req, res, next) => {
   
     client.ping().then(function(result) {
         res.send(result);
@@ -20,9 +21,7 @@ router.route('/ping').get(function(req, res, next) {
         next(error);
     });
     
-}).all(function(req, res, next) {
-    next(new Error(`${req.method} not supported at ${req.originalUrl}`));
-});
+}).all(routeErrorHandler);
 
 router.route('/bulk').post(function(req, res, next) {
   
@@ -34,15 +33,12 @@ router.route('/bulk').post(function(req, res, next) {
         data.push(value);
     });
     
-    //res.send({ body: data });
     client.bulk({ body: data }).then(function(result) {
         res.send(result);
     }, function(error) {
         next(error);
     });
     
-}).all(function(req, res, next) {
-    next(new Error(`${req.method} not supported at ${req.originalUrl}`));
-});
+}).all(routeErrorHandler);
 
 module.exports = router;
