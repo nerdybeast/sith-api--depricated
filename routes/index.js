@@ -67,6 +67,7 @@ var RoutesCore = function(app, io) {
     
     app.use('/api/classes', require('./api/classes'));
     app.use('/api/run-tests', require('./api/execute-test-run')(io));
+    app.use('/api/limits', require('./api/limits')(io));
     
     //TODO: app.use('/api', ...some module that converts the response between json & jsonApi);
     

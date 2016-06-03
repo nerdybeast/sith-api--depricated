@@ -2,9 +2,10 @@
 
 let express = require('express');
 let _ = require('lodash');
+let serializer = require('jsonapi-serializer').Serializer;
 let JsforceExt = require('../../lib/jsforceExt');
 let routeErrorHandler = require('../../lib/route-error-handler');
-let serializer = require('jsonapi-serializer').Serializer;
+let customSerializer = require('../../lib/json-api-serializer');
 
 module.exports = function(io) {
     
@@ -46,17 +47,11 @@ module.exports = function(io) {
             
             if(acceptsJsonApi) {
                 
-                let apexTestQueueItemData = new serializer(result.apexTestQueueItem.sobjectType, { 
-                    attributes: _.without(result.apexTestQueueItem.fieldNames, 'id')  
-                }).serialize(result.apexTestQueueItem.records);
-                
-                let asyncApexJobData = new serializer(result.asyncApexJob.sobjectType, { 
-                    attributes: _.without(result.asyncApexJob.fieldNames, 'id')  
-                }).serialize(result.asyncApexJob.records);
+                let apexTestQueueItemData = customSerializer.apexTestQueueItem(result.apexTestQueueItem.fieldNames, result.apexTestQueueItem.records);
+                let asyncApexJobData = customSerializer.asyncApexJob(result.asyncApexJob.fieldNames, result.asyncApexJob.records);
                 
                 let combinedData = _.concat(apexTestQueueItemData.data, asyncApexJobData.data);
                 return res.send({ data: combinedData });
-                
             }
             
             //Standard json response does not need to include the fieldNames array, ditch those arrays before returning.
