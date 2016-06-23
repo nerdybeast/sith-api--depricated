@@ -4,8 +4,10 @@ var jwt = require('express-jwt');
 var debug = require('debug')('api index');
 var isProd = (process.env.NODE_ENV === 'production');
 
-var RoutesCore = function(app, io) {
+var RoutesCore = function(app) {
     
+    let io = app.get('io');
+
     var authenticate = jwt({
         secret: new Buffer(process.env.AUTH0_CLIENT_SECRET, 'base64'),
         audience: process.env.AUTH0_CLIENT_ID
@@ -23,13 +25,6 @@ var RoutesCore = function(app, io) {
             sfLoginUrl: process.env.SF_LOGIN_URL
         });
     });
-    
-    //app.use('/auth', require('./auth'));
-    
-    // app.use('/api/*', function(res, req, next) {
-    //     debug('Hit /api middleware prior to jwt authentication.');
-    //     next();
-    // });
     
     app.use(function(req, res, next) {
         
@@ -66,8 +61,8 @@ var RoutesCore = function(app, io) {
     //is given. If not that, then serve up traditional json.
     
     app.use('/api/classes', require('./api/classes'));
-    app.use('/api/run-tests', require('./api/execute-test-run')(io));
-    app.use('/api/limits', require('./api/limits')(io));
+    app.use('/api/run-tests', require('./api/execute-test-run'));
+    app.use('/api/limits', require('./api/limits'));
     
     //TODO: app.use('/api', ...some module that converts the response between json & jsonApi);
     

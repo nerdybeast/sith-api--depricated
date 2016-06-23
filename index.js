@@ -9,6 +9,7 @@ var morgan = require('morgan');
 var cookieParser = require('cookie-parser'); //middle-ware that allows easy manipulation of cookies incoming/outgoing
 var bodyParser = require('body-parser'); //middle-ware that allows easy manipulation of request/response bodies
 var cors = require('cors');
+let _ = require('lodash');
 
 var app = express();
 
@@ -18,6 +19,11 @@ app.set('port', (process.env.PORT || 5000));
 
 let server = app.listen(app.get('port'));
 let io = require('socket.io')(server);
+
+require('./lib/io-manager')(io);
+
+//Set the io instance on the app so that we don't have to pass it as a function parameter to every module.
+app.set('io', io);
 
 app.use(morgan('dev'));
 app.use(cookieParser());
@@ -30,7 +36,7 @@ app.use(cors());
 
 //Automatically loads routes/index.js, see:
 //https://nodejs.org/api/modules.html#modules_folders_as_modules
-require('./routes')(app, io);
+require('./routes')(app);
 
 server.on('listening', function() {
     console.log('Node app is running on port', app.get('port'));
@@ -38,33 +44,4 @@ server.on('listening', function() {
 
 server.on('error', function(err) {
     console.log('Server error =>', err);
-});
-
-
-
-// io.use((socket, next) => {
-//     console.log(socket.request);
-//     next();
-// });
-
-io.on('connection', (socket) => {
-    
-    console.log('Client Connected');
-    
-    //Will emit to just the new client that has connected.
-    socket.emit('debug-from-server', 'Welcome new client!');
-    
-    //Will emit to all clients that are connected.
-    io.emit('debug-from-server', 'Hey everyone, there is a new client!');
-    
-    //Custom hook
-    socket.on('debug-from-client', function(from, data) {
-       console.log(`Received message from ${from} =>`, data);
-    });
-    
-    //Default socket.io hook
-    socket.on('disconnect', function(from, data) {
-       //TODO: Handle a client disconnecting...
-       console.log(`Client disconnected`);
-    });
 });
