@@ -1,14 +1,14 @@
 'use strict';
 
-var jwt = require('express-jwt');
-var debug = require('debug')('api index');
-var isProd = (process.env.NODE_ENV === 'production');
+let jwt = require('express-jwt');
+let debug = require('debug')('api index');
+let isProd = (process.env.NODE_ENV === 'production');
 
-var RoutesCore = function(app) {
+let RoutesCore = function(app) {
     
     let io = app.get('io');
 
-    var authenticate = jwt({
+    let authenticate = jwt({
         secret: new Buffer(process.env.AUTH0_CLIENT_SECRET, 'base64'),
         audience: process.env.AUTH0_CLIENT_ID
     });
@@ -37,7 +37,7 @@ var RoutesCore = function(app) {
         let acceptsJsonApi = req.accepts(jsonApiMimeType);
         
         if(!acceptsJson && !acceptsJsonApi) {
-            var err = new Error(`All requests to this api must specify an "Accept" header with a value of either "${jsonApiMimeType}" or "${jsonMimeType}"`);
+            let err = new Error(`All requests to this api must specify an "Accept" header with a value of either "${jsonApiMimeType}" or "${jsonMimeType}"`);
             err.type = 'UNSUPPORTED_MEDIA_TYPE';
             err.statusCode = 415;
             return next(err);
@@ -69,7 +69,7 @@ var RoutesCore = function(app) {
     //Catch a 404 (request that didn't match a route defined above) and pass it down below to an error handler.
     //NOTE: Errors thrown in above routes will not be caught here because this function does not accept an error parameter.
     app.use(function(req, res, next) {
-        var err = new Error('Not Found');
+        let err = new Error('Not Found');
         err.type = 'RESOURCE_NOT_FOUND';
         err.statusCode = 404;
         next(err);
@@ -79,7 +79,7 @@ var RoutesCore = function(app) {
     //http://expressjs.com/en/guide/error-handling.html
     app.use(function(err, req, res, next) {
 
-        var status = err.statusCode || 500;
+        let status = err.statusCode || 500;
 
         return res.status(status).send({ 
             message: err.message,

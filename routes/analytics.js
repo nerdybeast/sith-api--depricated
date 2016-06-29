@@ -3,22 +3,24 @@
 let express = require('express');
 let _ = require('lodash');
 let elasticsearch = require('elasticsearch');
-let routeErrorHandler = require('../lib/route-error-handler')
+let routeErrorHandler = require('../lib/route-error-handler');
+let db = require('../lib/db');
 
 let router = express.Router();
 
-let client = new elasticsearch.Client({
-    host: process.env.SEARCHBOX_URL,
-    log: 'trace',
-    apiVersion: '2.1'
-});
-
 router.route('/ping').get((req, res, next) => {
-  
-    client.ping().then(function(result) {
-        res.send(result);
+
+    let startTime = new Date().getTime();
+
+    db.ping().then(function(result) {
+        
+        let available = result;
+        let responseTime = new Date().getTime() - startTime;
+
+        return res.send({ available, responseTime });
+
     }, function(error) {
-        next(error);
+        return next(error);
     });
     
 }).all(routeErrorHandler);
@@ -26,18 +28,7 @@ router.route('/ping').get((req, res, next) => {
 router.route('/bulk').post(function(req, res, next) {
   
     let analytics = req.body || [];
-    let data = [];
-    
-    _.forEach(analytics, function(value) {
-        data.push({ create: { _index: 'analytics', _type: 'test' } });
-        data.push(value);
-    });
-    
-    client.bulk({ body: data }).then(function(result) {
-        res.send(result);
-    }, function(error) {
-        next(error);
-    });
+    return db.bulkAnalyticUpload(analytics);
     
 }).all(routeErrorHandler);
 

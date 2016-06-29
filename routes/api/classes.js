@@ -8,7 +8,7 @@ let serializer = require('jsonapi-serializer').Serializer;
 let routeErrorHandler = require('../../lib/route-error-handler');
 
 let Debug = require('../../lib/debug');
-let d = new Debug('CLASSES');
+let _debug = new Debug('CLASSES');
 
 let router = express.Router();
 
@@ -34,7 +34,7 @@ router.use(function(req, res, next) {
         //Let's remove the body fields because they will contain the entire contents of the class which will make our response huge.
         fieldNames = _.without(fieldNamesResult, 'body', 'bodyCrc');
         
-        d.log(`ApexClass field names => ${fieldNames.join(', ')}`);
+        _debug.log(`ApexClass field names => ${fieldNames.join(', ')}`);
         
         /**
          * Here we need to strip of the "id" field so that it doesn't end up in the "attributes" section of the json api document.
@@ -55,7 +55,7 @@ router.use(function(req, res, next) {
          */
         let jsonApiFieldNames = _.without(fieldNames, 'id');
         
-        d.log(`jsonApiFieldNames => ${jsonApiFieldNames.join(', ')}`);
+        _debug.log(`jsonApiFieldNames => ${jsonApiFieldNames.join(', ')}`);
         
         //We will be adding this additional field to the response below.
         jsonApiFieldNames.push('isTestClass');
@@ -99,31 +99,5 @@ router.route('/').get(function(req, res, next) {
     });
     
 }).all(routeErrorHandler);
-
-//router.all('*', routeErrorHandler);
-
-// router.route('/istest').get(function(req, res, next) {
-    
-//     jExt.getTestClasses(fieldNames).then(function(result) {
-        
-//         console.log(result[0]);
-        
-//         //Stripping off the "attributes" property for now.
-//         var strippedResult = _.map(result, function(record) {
-//             return _.pick(record, fieldNames);
-//         });
-        
-//         console.log('@isTest count:', strippedResult.length);
-        
-//         return res.send(strippedResult);
-        
-//     }).catch(function(error) {
-//         var exception = new Error(error.message);
-//         exception.type = error.errorCode;
-//         exception.statusCode = 400;
-//         return next(exception);
-//     });
-    
-// }).all(routeErrorHandler);
 
 module.exports = router;

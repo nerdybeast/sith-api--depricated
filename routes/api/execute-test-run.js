@@ -6,6 +6,9 @@ let serializer = require('jsonapi-serializer').Serializer;
 let JsforceExt = require('../../lib/jsforceExt');
 let routeErrorHandler = require('../../lib/route-error-handler');
 let customSerializer = require('../../lib/json-api-serializer');
+let Debug = require('../../lib/debug');
+
+let _debug = new Debug('EXECUTE_TEST_RUN');
 
 let router = express.Router();
 let jExt;
@@ -34,7 +37,7 @@ router.route('/').post(function(req, res, next) {
     return jExt.createTraceFlag(userId).then(result => {
     
         io.emit('debug-from-server', { traceFlag: result });
-        console.log('SITH => create trace flag:', result);
+        _debug.log('Created TraceFlag', result);
     
         return jExt.triggerAsyncTestRun(classIds);
         
