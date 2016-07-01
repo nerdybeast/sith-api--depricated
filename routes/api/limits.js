@@ -3,6 +3,7 @@
 let express = require('express');
 let routeErrorHandler = require('../../lib/route-error-handler');
 let JsforceExt = require('../../lib/jsforceExt');
+let cache = require('../../lib/cache');
     
 let router = express.Router();
 let jExt;
@@ -20,10 +21,12 @@ router.use((req, res, next) => {
     next();
 });
 
-router.route('/').get((req, res, next) => {
+router.route('/:orgId').get((req, res, next) => {
     
     return jExt.getOrgLimits().then(result => {
         
+        jExt.watchOrgLimits(req.params.orgId);
+
         return res.send(result);
         
     }).catch(function(error) {

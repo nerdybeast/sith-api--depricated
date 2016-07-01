@@ -8,11 +8,6 @@ let RoutesCore = function(app) {
     
     let io = app.get('io');
 
-    let authenticate = jwt({
-        secret: new Buffer(process.env.AUTH0_CLIENT_SECRET, 'base64'),
-        audience: process.env.AUTH0_CLIENT_ID
-    });
-    
     app.get('/', function(req, res) {
         
         io.emit('debug-from-server', {
@@ -55,14 +50,22 @@ let RoutesCore = function(app) {
     app.use('/services', require('./org-services'));
     
     //Authenticate all requests to /api*
-    app.use('/api', authenticate);
+    app.use('/api', jwt({
+        secret: new Buffer(process.env.AUTH0_CLIENT_SECRET, 'base64'),
+        audience: process.env.AUTH0_CLIENT_ID
+    }), (req, res, next) => {
+        let x = true;
+        next();
+    });
     
     //TODO: Need to account for the "Content-Type" passed, we only want to serve up a json api doc if "application/vnd.api+json"
     //is given. If not that, then serve up traditional json.
     
+    app.use('/api/user', require('./api/manage-users'));
     app.use('/api/classes', require('./api/classes'));
     app.use('/api/run-tests', require('./api/execute-test-run'));
     app.use('/api/limits', require('./api/limits'));
+    app.use('/api/dashboard', require('./api/setup'));
     
     //TODO: app.use('/api', ...some module that converts the response between json & jsonApi);
     
