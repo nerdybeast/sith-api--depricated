@@ -3,6 +3,9 @@
 let jwt = require('express-jwt');
 let debug = require('debug')('api index');
 let isProd = (process.env.NODE_ENV === 'production');
+const rollbar = require('rollbar');
+
+rollbar.init(process.env.ROLLBAR_ACCESS_TOKEN);
 
 let RoutesCore = function(app) {
     
@@ -77,6 +80,8 @@ let RoutesCore = function(app) {
         err.statusCode = 404;
         next(err);
     });
+
+    app.use(rollbar.errorHandler());
 
     //This function will only catch errors if it has 4 parameters, see:
     //http://expressjs.com/en/guide/error-handling.html
