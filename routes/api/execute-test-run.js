@@ -46,7 +46,7 @@ router.route('/').post(function(req, res, next) {
         let asyncApexJob = result.asyncApexJob.records[0];
         
         //This is a void return method that will continue to monitor the test run using socket.io
-        jExt.getTestRunStatus(asyncApexJob.id);
+        jExt.getTestRunStatus(asyncApexJob.id, userId);
         
         if(acceptsJsonApi) {
             

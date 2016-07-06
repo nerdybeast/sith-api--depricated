@@ -25,8 +25,8 @@ router.route('/').post((req, res, next) => {
     
     if(!_.isEqual(cachedProfile, newProfile)) {
         
-        //Cache the new profile for an hour.
-        cache.set(cacheKey, newProfile, (60 * 60), (err, success) => {
+        //Cache the new profile for 12 hours.
+        cache.set(cacheKey, newProfile, (60 * 60 * 12), (err, success) => {
             if(err) { _debug.log('Error setting profile in the cache', err); }
         });
     }

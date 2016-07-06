@@ -36,11 +36,17 @@ node_modules
 # Everything above this line is default node.js ignore from Github #
 ####################################################################
 
-# Visual Studio Code settings
+## Visual Studio Code settings ##
+
+# Typings is a TypeScript definition directory for getting better intellisense within Visual Studio Code
+# We need to ignore this directory because it is used for developer preference. 
 typings
+
+typings.json
+jsconfig.json
 .vscode
 
-# Webstorm settings
+## Webstorm settings ##
 .idea
 
 # Environment settings
