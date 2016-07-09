@@ -1,15 +1,14 @@
 'use strict';
 
-let Q = require('q');
-let express = require('express');
-let _ = require('lodash');
-let JsforceExt = require('../../lib/jsforceExt');
-let serializer = require('jsonapi-serializer').Serializer;
-let routeErrorHandler = require('../../lib/route-error-handler');
+const Q = require('q');
+const express = require('express');
+const _ = require('lodash');
+const serializer = require('jsonapi-serializer').Serializer;
+const JsforceExt = require('../../lib/jsforceExt');
+const routeErrorHandler = require('../../lib/route-error-handler');
+const Debug = require('../../lib/debug');
 
-let Debug = require('../../lib/debug');
 let _debug = new Debug('CLASSES');
-
 let router = express.Router();
 
 //Will hold an instance of our extended jsforce module.
