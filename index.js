@@ -13,6 +13,10 @@ let bodyParser = require('body-parser');
 let cors = require('cors');
 let _ = require('lodash');
 
+//Creates a middleware that records the response time for requests.
+//https://www.npmjs.com/package/response-time
+const responseTime = require('response-time');
+
 let app = express();
 
 //Storing some custom settings on the Express object so that they can be accessed later if neccessary.
@@ -28,6 +32,7 @@ require('./lib/io-manager')(io);
 app.set('io', io);
 
 app.use(morgan('dev'));
+app.use(responseTime({ digits:0 }));
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
