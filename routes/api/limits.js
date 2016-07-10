@@ -3,20 +3,25 @@
 const express = require('express');
 const routeErrorHandler = require('../../lib/route-error-handler');
 const JsforceExt = require('../../lib/jsforceExt');
-const cache = require('../../lib/cache');
     
 let router = express.Router();
 let jExt;
-let io;
 
 router.use((req, res, next) => {
     
-    io = req.app.get('io');
+    let io = req.app.get('io');
 
-    jExt = new JsforceExt({
+    let connectionDetails = {
         accessToken: req.headers.sessionid,
         instanceUrl: req.headers.instanceurl
-    }, io);
+    };
+
+    let profile = {
+        userId: req.headers.userId,
+        orgId: req.headers.orgId
+    }; 
+
+    jExt = new JsforceExt(connectionDetails, profile, io);
     
     next();
 });

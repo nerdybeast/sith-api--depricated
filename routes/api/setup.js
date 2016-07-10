@@ -13,10 +13,19 @@ let jExt;
 
 router.use((req, res, next) => {
     
-    jExt = new JsforceExt({
+    let io = req.app.get('io');
+
+    let connectionDetails = {
         accessToken: req.headers.sessionid,
         instanceUrl: req.headers.instanceurl
-    }, req.app.get('io'));
+    };
+
+    let profile = {
+        userId: req.headers.userId,
+        orgId: req.headers.orgId
+    }; 
+
+    jExt = new JsforceExt(connectionDetails, profile, io);
     
     next();
 });

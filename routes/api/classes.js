@@ -23,10 +23,19 @@ let ClassSerializer;
 //This middleware function will be invoked for every request made to a route defined in this file.
 router.use(function(req, res, next) {
     
-    jExt = new JsforceExt({
+    let io = req.app.get('io');
+
+    let connectionDetails = {
         accessToken: req.headers.sessionid,
         instanceUrl: req.headers.instanceurl
-    }, null);
+    };
+
+    let profile = {
+        userId: req.headers.userId,
+        orgId: req.headers.orgId
+    }; 
+
+    jExt = new JsforceExt(connectionDetails, profile, io);
     
     jExt.getSobjectFieldNames('ApexClass').then(function(fieldNamesResult) {
         

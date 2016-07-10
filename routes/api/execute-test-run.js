@@ -18,10 +18,17 @@ router.use(function(req, res, next) {
     
     io = req.app.get('io');
 
-    jExt = new JsforceExt({
+    let connectionDetails = {
         accessToken: req.headers.sessionid,
         instanceUrl: req.headers.instanceurl
-    }, io);
+    };
+
+    let profile = {
+        userId: req.headers.userId,
+        orgId: req.headers.orgId
+    }; 
+
+    jExt = new JsforceExt(connectionDetails, profile, io);
     
     next();
 });
