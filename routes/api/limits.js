@@ -17,8 +17,8 @@ router.use((req, res, next) => {
     };
 
     let profile = {
-        userId: req.headers.userId,
-        orgId: req.headers.orgId
+        userId: req.headers.userid,
+        orgId: req.headers.orgid
     }; 
 
     jExt = new JsforceExt(connectionDetails, profile, io);
