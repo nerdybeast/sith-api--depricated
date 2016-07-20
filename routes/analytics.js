@@ -28,7 +28,9 @@ router.route('/ping').get((req, res, next) => {
 router.route('/bulk').post(function(req, res, next) {
   
     let analytics = req.body || [];
-    db.bulkAnalyticUpload(analytics).then(result => {
+    let orgId = req.headers.orgid || 'test';
+
+    db.bulkAnalyticUpload(analytics, orgid).then(result => {
         return res.send(result);
     }).catch(error => {
         return next(error);
