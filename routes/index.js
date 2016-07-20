@@ -2,8 +2,10 @@
 
 let jwt = require('express-jwt');
 let debug = require('debug')('api index');
-let isProd = (process.env.NODE_ENV === 'production');
 const rollbar = require('rollbar');
+const JsforceExt = require('../lib/jsforceExt');
+
+let isProd = (process.env.NODE_ENV === 'production');
 
 rollbar.init(process.env.ROLLBAR_ACCESS_TOKEN);
 
@@ -57,10 +59,29 @@ let RoutesCore = function(app) {
         secret: new Buffer(process.env.AUTH0_CLIENT_SECRET, 'base64'),
         audience: process.env.AUTH0_CLIENT_ID
     }), (req, res, next) => {
-        let x = true;
         next();
     });
     
+    app.use('/api', function(req, res, next) {
+        
+        let connectionDetails = {
+            accessToken: req.headers.sessionid,
+            instanceUrl: req.headers.instanceurl
+        };
+
+        let profile = {
+            userId: req.headers.userid,
+            orgId: req.headers.orgid
+        }; 
+
+        app.set('jExt', new JsforceExt(connectionDetails, profile, io));
+
+        //Turn this query param into a solid boolean
+        req.query.force = (req.query.force !== undefined);
+
+        next();
+    });
+
     //TODO: Need to account for the "Content-Type" passed, we only want to serve up a json api doc if "application/vnd.api+json"
     //is given. If not that, then serve up traditional json.
     
@@ -69,6 +90,7 @@ let RoutesCore = function(app) {
     app.use('/api/run-tests', require('./api/execute-test-run'));
     app.use('/api/limits', require('./api/limits'));
     app.use('/api/dashboard', require('./api/setup'));
+    app.use('/api/sobjects', require('./api/sobjects'));
     
     //TODO: app.use('/api', ...some module that converts the response between json & jsonApi);
     
@@ -81,7 +103,9 @@ let RoutesCore = function(app) {
         next(err);
     });
 
-    app.use(rollbar.errorHandler());
+    if(process.env.NODE_ENV !== 'localhost') {
+        app.use(rollbar.errorHandler());
+    }
 
     //This function will only catch errors if it has 4 parameters, see:
     //http://expressjs.com/en/guide/error-handling.html
