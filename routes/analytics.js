@@ -30,7 +30,7 @@ router.route('/bulk').post(function(req, res, next) {
     let analytics = req.body || [];
     let orgId = req.headers.orgid || 'test';
 
-    db.bulkAnalyticUpload(analytics, orgid).then(result => {
+    db.bulkAnalyticUpload(analytics, orgId).then(result => {
         return res.send(result);
     }).catch(error => {
         return next(error);
