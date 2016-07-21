@@ -28,7 +28,13 @@ router.route('/ping').get((req, res, next) => {
 router.route('/bulk').post(function(req, res, next) {
   
     let analytics = req.body || [];
-    return db.bulkAnalyticUpload(analytics);
+    let orgId = req.headers.orgid || 'test';
+
+    db.bulkAnalyticUpload(analytics, orgId).then(result => {
+        return res.send(result);
+    }).catch(error => {
+        return next(error);
+    });
     
 }).all(routeErrorHandler);
 
