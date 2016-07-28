@@ -34,8 +34,10 @@ app.set('io', io);
 app.use(morgan('dev'));
 app.use(responseTime({ digits:0 }));
 app.use(cookieParser());
-app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+
+//Tell the json body parser to parse all request bodies that contain a Content-Type matching this expression. 
+app.use(bodyParser.json({ type: 'application/*+json' }));
 
 //Currently this is used to enable all cross origin requests.
 //TODO: Restrict access when in production, possibly staging as well...
