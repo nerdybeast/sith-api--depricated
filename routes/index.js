@@ -2,8 +2,10 @@
 
 let jwt = require('express-jwt');
 let debug = require('debug')('api index');
-let isProd = (process.env.NODE_ENV === 'production');
 const rollbar = require('rollbar');
+const JsforceExt = require('../lib/jsforceExt');
+
+let isProd = (process.env.NODE_ENV === 'production');
 
 rollbar.init(process.env.ROLLBAR_ACCESS_TOKEN);
 
@@ -34,8 +36,20 @@ let RoutesCore = function(app) {
         let acceptsJson = req.accepts(jsonMimeType);
         let acceptsJsonApi = req.accepts(jsonApiMimeType);
         
+        //These variables will also return a string if the given value matches the Content-Type of the request, here we are forcing into a boolean value.
+        let isPlainJson = (req.is(jsonMimeType) !== false);
+        let isJsonApi = (req.is(jsonApiMimeType) !== false);
+
         if(!acceptsJson && !acceptsJsonApi) {
-            let err = new Error(`All requests to this api must specify an "Accept" header with a value of either "${jsonApiMimeType}" or "${jsonMimeType}"`);
+            let err = new Error(`All requests to this api must specify an "Accept" header with a value of either "${jsonApiMimeType}" or "${jsonMimeType}".`);
+            err.type = 'UNSUPPORTED_MEDIA_TYPE';
+            err.statusCode = 415;
+            return next(err);
+        }
+
+        //NOTE: Content-Type is not usually passed with some http verbs such as a GET request.
+        if(req.get('Content-Type') && !isPlainJson && !isJsonApi) {
+            let err = new Error(`All requests to this api containing a body (valid json), must specify a "Content-Type" header with a value of either "${jsonApiMimeType}" or "${jsonMimeType}".`);
             err.type = 'UNSUPPORTED_MEDIA_TYPE';
             err.statusCode = 415;
             return next(err);
@@ -46,6 +60,8 @@ let RoutesCore = function(app) {
         //See: http://expressjs.com/en/api.html#req.accepts
         req.headers.acceptsJsonApi = (acceptsJsonApi && acceptsJsonApi !== false);
         
+        req.headers.isJsonApi = isJsonApi;
+
         return next();
     });
     
@@ -57,10 +73,29 @@ let RoutesCore = function(app) {
         secret: new Buffer(process.env.AUTH0_CLIENT_SECRET, 'base64'),
         audience: process.env.AUTH0_CLIENT_ID
     }), (req, res, next) => {
-        let x = true;
         next();
     });
     
+    app.use('/api', function(req, res, next) {
+        
+        let connectionDetails = {
+            accessToken: req.headers.sessionid,
+            instanceUrl: req.headers.instanceurl
+        };
+
+        let profile = {
+            userId: req.headers.userid,
+            orgId: req.headers.orgid
+        }; 
+
+        app.set('jExt', new JsforceExt(connectionDetails, profile, io));
+
+        //Turn this query param into a solid boolean
+        req.query.force = (req.query.force !== undefined);
+
+        next();
+    });
+
     //TODO: Need to account for the "Content-Type" passed, we only want to serve up a json api doc if "application/vnd.api+json"
     //is given. If not that, then serve up traditional json.
     
@@ -69,6 +104,7 @@ let RoutesCore = function(app) {
     app.use('/api/run-tests', require('./api/execute-test-run'));
     app.use('/api/limits', require('./api/limits'));
     app.use('/api/dashboard', require('./api/setup'));
+    app.use('/api/sobjects', require('./api/sobjects'));
     
     //TODO: app.use('/api', ...some module that converts the response between json & jsonApi);
     
@@ -81,22 +117,32 @@ let RoutesCore = function(app) {
         next(err);
     });
 
-    app.use(rollbar.errorHandler());
+    if(process.env.NODE_ENV !== 'localhost') {
+        app.use(rollbar.errorHandler());
+    }
 
     //This function will only catch errors if it has 4 parameters, see:
     //http://expressjs.com/en/guide/error-handling.html
     app.use(function(err, req, res, next) {
 
-        let status = err.statusCode || 500;
+        let exception = {
+            status: err.statusCode || 500,
+            code: err.errorCode || 'UNKNOWN_ERROR',
+            title: err.title || 'An unknown error has occured',
+            detail: err.message || 'An unknown error has occured',
+            meta: {
+                stackTrace: err.stackTrace
+            }
+        };
 
-        return res.status(status).send({ 
-            message: err.message,
-            //Prevent leaking stack trace info in Prod.
-            //stackTrace: (isProd ? null : err.stack),
-            stackTrace: err.stack,
-            type: err.type,
-            code: status
-        });
+        if(req.headers.acceptsJsonApi) {
+
+            return res.status(exception.status).send({
+                errors: [exception]
+            });
+        }
+
+        return res.status(exception.status).send(exception);
     });
 }
 
