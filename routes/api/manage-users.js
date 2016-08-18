@@ -36,8 +36,6 @@ router.route('/:user_id').get((req, res, next) => {
 
     }).then(profile => {
 
-        //profile = result;
-
         let customDomain = profile.urls.custom_domain;
 		let enterprise = profile.urls.enterprise;
 
@@ -45,10 +43,6 @@ router.route('/:user_id').get((req, res, next) => {
         let instanceUrl = customDomain || enterprise.substring(0, enterprise.indexOf('/services'));
 
         let sessionId = profile.identities[0].access_token;
-
-    //     return db.insertProfile(profile);
-
-    // }).then(result => {
 
         return res.send({ instanceUrl, sessionId });
 
@@ -79,8 +73,8 @@ function getAuthTokenAsync() {
 
         request(options, function (error, response, body) {
 
-            if(error) {
-                let exception = new Error(error);
+            if(error || body.error) {
+                let exception = new Error(error || body);
                 return reject(error);
             }
 
@@ -107,8 +101,8 @@ function getProfileAsync(accessToken, userId) {
 
         request(options, function (error, response, body) {
             
-            if(error) {
-                let exception = new Error(error);
+            if(error || body.error) {
+                let exception = new Error(error || body);
                 return reject(error);
             }
 
