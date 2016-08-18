@@ -87,7 +87,7 @@ function getProfileAsync(accessToken, userId) {
         request(options, function (error, response, body) {
             
             if(error || body.error) {
-                let exception = new Error(error || body);
+                let exception = new Error(error || body.message);
                 return reject(error);
             }
 
