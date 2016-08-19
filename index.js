@@ -1,17 +1,16 @@
 'use strict';
 
-let http = require('http');
-let express = require('express');
-let morgan = require('morgan');
+const http = require('http');
+const express = require('express');
+const morgan = require('morgan');
+const cors = require('cors');
+const _ = require('lodash');
 
 //middle-ware that allows easy manipulation of cookies incoming/outgoing
-let cookieParser = require('cookie-parser');
+const cookieParser = require('cookie-parser');
 
 //middle-ware that allows easy manipulation of request/response bodies
-let bodyParser = require('body-parser');
-
-let cors = require('cors');
-let _ = require('lodash');
+const bodyParser = require('body-parser');
 
 //Creates a middleware that records the response time for requests.
 //https://www.npmjs.com/package/response-time

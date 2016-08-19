@@ -58,10 +58,19 @@ function getAuthTokenAsync() {
 
         request(options, function (error, response, body) {
 
-            if(error || body.error) {
-                let exception = new Error(error || body);
+            request(options, function (error, response, body) {
+
+            if(error) {
                 return reject(error);
+            } else if(body.error) {
+                let exception = new Error(body.message);
+                exception.statusCode = body.statusCode;
+                exception.errorCode = body.error;
+                return reject(exception);
             }
+
+            return resolve(body);
+        });
 
             return resolve(body);
         });
@@ -85,10 +94,14 @@ function getProfileAsync(accessToken, userId) {
         };
 
         request(options, function (error, response, body) {
-            
-            if(error || body.error) {
-                let exception = new Error(error || body.message);
+
+            if(error) {
                 return reject(error);
+            } else if(body.error) {
+                let exception = new Error(body.message);
+                exception.statusCode = body.statusCode;
+                exception.errorCode = body.error;
+                return reject(exception);
             }
 
             return resolve(body);

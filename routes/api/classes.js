@@ -1,6 +1,6 @@
 'use strict';
 
-const Q = require('q');
+const Promise = require('bluebird');
 const express = require('express');
 const _ = require('lodash');
 const serializer = require('jsonapi-serializer').Serializer;
@@ -79,7 +79,7 @@ router.use(function(req, res, next) {
 
 router.route('/').get(function(req, res, next) {
     
-    return Q.all([
+    return Promise.all([
         jExt.getTestClasses(fieldNames),
         jExt.getAllClasses(fieldNames)
     ]).then(function(result) {

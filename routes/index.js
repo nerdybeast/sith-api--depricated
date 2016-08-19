@@ -1,11 +1,9 @@
 'use strict';
 
-let jwt = require('express-jwt');
-let debug = require('debug')('api index');
+const jwt = require('express-jwt');
+const debug = require('debug')('api index');
 const rollbar = require('rollbar');
 const JsforceExt = require('../lib/jsforceExt');
-
-let isProd = (process.env.NODE_ENV === 'production');
 
 rollbar.init(process.env.ROLLBAR_ACCESS_TOKEN);
 
@@ -135,11 +133,9 @@ let RoutesCore = function(app) {
             }
         };
 
+        //Will be true if the client is expecting a JSON API spec response.
         if(req.headers.acceptsJsonApi) {
-
-            return res.status(exception.status).send({
-                errors: [exception]
-            });
+            exception = { errors: [exception] };
         }
 
         return res.status(exception.status).send(exception);

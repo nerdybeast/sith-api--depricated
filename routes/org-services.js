@@ -1,11 +1,11 @@
 'use strict';
 
-let express = require('express');
-let _ = require('lodash');
-let request = require('request');
-let serializer = require('jsonapi-serializer').Serializer;
-let routeErrorHandler = require('../lib/route-error-handler');
-let orgVersions = require('../lib/org-versions');
+const express = require('express');
+const _ = require('lodash');
+const request = require('request');
+const serializer = require('jsonapi-serializer').Serializer;
+const routeErrorHandler = require('../lib/route-error-handler');
+const orgVersions = require('../lib/org-versions');
 
 let router = express.Router();
 
