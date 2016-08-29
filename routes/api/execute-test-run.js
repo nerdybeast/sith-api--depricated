@@ -14,36 +14,18 @@ let router = express.Router();
 let jExt;
 let io;
 
-router.use(function(req, res, next) {
-    
-    io = req.app.get('io');
-
-    let connectionDetails = {
-        accessToken: req.headers.sessionid,
-        instanceUrl: req.headers.instanceurl
-    };
-
-    let profile = {
-        userId: req.headers.userid,
-        orgId: req.headers.orgid
-    }; 
-
-    jExt = new JsforceExt(connectionDetails, profile, io);
-    
-    next();
-});
-
 router.route('/').post(function(req, res, next) {
     
     let classIds = req.body.data.classIds || [];
     let userId = req.body.data.userId;
     let acceptsJsonApi = req.headers.acceptsJsonApi;
+    let jExt = req.app.get('jExt');
     
     //TODO: need to see if creating a new traceflag here is going to interupt a test that is currently running.
     //If so, we will need to check for that before creating the new traceflag.
     return jExt.createAnalyticsTraceFlag(userId).then(result => {
     
-        io.emit('debug-from-server', { traceFlag: result });
+        //io.emit('debug-from-server', { traceFlag: result });
         _debug.log('Created TraceFlag', result);
     
         return jExt.triggerAsyncTestRun(classIds);
@@ -59,8 +41,9 @@ router.route('/').post(function(req, res, next) {
             
             let apexTestQueueItemData = customSerializer.apexTestQueueItem(result.apexTestQueueItem.fieldNames, result.apexTestQueueItem.records);
             let asyncApexJobData = customSerializer.asyncApexJob(result.asyncApexJob.fieldNames, result.asyncApexJob.records);
+            let apexTestRunResultData = customSerializer.apexTestRunResult(result.apexTestRunResult.fieldNames, result.apexTestRunResult.records);
             
-            let combinedData = _.concat(apexTestQueueItemData.data, asyncApexJobData.data);
+            let combinedData = _.concat(apexTestQueueItemData.data, asyncApexJobData.data, apexTestRunResultData.data);
             return res.send({ data: combinedData });
         }
         
