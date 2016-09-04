@@ -135,7 +135,9 @@ let RoutesCore = function(app) {
 
         //Will be true if the client is expecting a JSON API spec response.
         if(req.headers.acceptsJsonApi) {
-            exception = { errors: [exception] };
+            return res.status(exception.status).send({ 
+                errors: [exception] 
+            });
         }
 
         return res.status(exception.status).send(exception);

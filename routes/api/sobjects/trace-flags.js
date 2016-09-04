@@ -22,8 +22,11 @@ router.route('/').get(function(req, res, next) {
                 return res.send(traceFlagQueryResult.records);
             }
 
-        }).catch(err => {
-            return next(err);
+        }).catch(error => {
+            error.statusCode = 400;
+            error.title = 'TraceFlag Search Error';
+            error.stackTrace = error.stack;
+            return next(error);
         });
 
     }
