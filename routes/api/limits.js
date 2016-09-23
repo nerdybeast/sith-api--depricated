@@ -2,7 +2,6 @@
 
 const express = require('express');
 const routeErrorHandler = require('../../lib/route-error-handler');
-const JsforceExt = require('../../lib/jsforceExt');
     
 let router = express.Router();
 

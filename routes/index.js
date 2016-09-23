@@ -53,7 +53,7 @@ let RoutesCore = function(app) {
         }; 
 
         app.set('jExt', new JsforceExt(connectionDetails, profile, io));
-        app.set('sf', new Salesforce(connectionDetails, profile));
+        app.set('sf', new Salesforce(connectionDetails, profile, io));
 
         //Turn this query param into a solid boolean
         req.query.force = (req.query.force !== undefined);
