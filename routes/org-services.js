@@ -3,13 +3,13 @@
 const express = require('express');
 const _ = require('lodash');
 const request = require('request');
-const serializer = require('jsonapi-serializer').Serializer;
+const Serializer = require('jsonapi-serializer').Serializer;
 const routeErrorHandler = require('../lib/route-error-handler');
 const orgVersions = require('../lib/org-versions');
 
 let router = express.Router();
 
-let ServicesDataSerializer = new serializer('org-api-versions', {
+let ServicesDataSerializer = new Serializer('org-api-versions', {
     attributes: ['label', 'url', 'version']
 });
 

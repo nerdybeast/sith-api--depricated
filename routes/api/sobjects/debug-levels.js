@@ -7,10 +7,10 @@ let router = express.Router();
 
 router.route('/').get(function(req, res, next) {
     
-    let jExt = req.app.get('jExt');
+    let sf = req.app.get('sf');
 
     //NOTE: req.query.force has already been validated and established as a legit boolean value.
-    jExt.getAllDebugLevels(req.query.force).then(debugLevelQueryResult => {
+    sf.getAllDebugLevels(req.query.force).then(debugLevelQueryResult => {
         
         if(req.headers.acceptsJsonApi) {
             let serializedResult = serializer.debugLevel(debugLevelQueryResult.fieldNames, debugLevelQueryResult.records);

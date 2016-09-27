@@ -6,14 +6,20 @@ const _ = require('lodash');
 const customSerializer = require('../../../lib/json-api-serializer');
 
 let router = express.Router();
+let sf;
+
+router.use(function(req, res, next) {
+    sf = req.app.get('sf');
+    next();
+})
 
 router.route('/').get(function(req, res, next) {
-    
-    let jExt = req.app.get('jExt');
+
+    //TODO: need to handle if a query param of "user" is not supplied...
 
     if(req.query.user) {
 
-        jExt.getTraceFlagsByUserId(req.query.user).then(traceFlagQueryResult => {
+        sf.getTraceFlagsByUserId(req.query.user).then(traceFlagQueryResult => {
             
             if(req.headers.acceptsJsonApi) {
                 let serializedResult = customSerializer.traceFlag(traceFlagQueryResult.fieldNames, traceFlagQueryResult.records);
@@ -33,13 +39,11 @@ router.route('/').get(function(req, res, next) {
 
 }).post(function(req, res, next) {
 
-    let jExt = req.app.get('jExt');
-
     if(req.headers.isJsonApi) {
 
         customSerializer.deserializeAsync(req.body).then(traceFlag => {
             
-            return jExt.conn.tooling.sobject('TraceFlag').create(traceFlag);
+            return sf.conn.tooling.sobject('TraceFlag').create(traceFlag);
 
         }).then(createResult => {
 
@@ -68,7 +72,7 @@ router.route('/:traceFlagId').patch(function(req, res, next) {
             //Salesforce chokes for some reason if the given "id" property is not capitalized which is odd because it doesn't hold this restriction on other api calls. 
             validFieldsForUpdate.Id = traceFlag.id;
 
-            return req.app.get('jExt').conn.tooling.sobject('TraceFlag').update(validFieldsForUpdate);
+            return sf.conn.tooling.sobject('TraceFlag').update(validFieldsForUpdate);
 
         }).then(updateResult => {
 
@@ -85,7 +89,7 @@ router.route('/:traceFlagId').patch(function(req, res, next) {
 
 }).delete(function(req, res, next) {
     
-    req.app.get('jExt').conn.tooling.sobject('TraceFlag').del(req.params.traceFlagId).then(result => {
+    sf.conn.tooling.sobject('TraceFlag').del(req.params.traceFlagId).then(result => {
 
         return res.send({
             meta: result
