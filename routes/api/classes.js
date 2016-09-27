@@ -4,10 +4,8 @@ const Promise = require('bluebird');
 const express = require('express');
 const _ = require('lodash');
 const serializer = require('../../lib/json-api-serializer');
-const JsforceExt = require('../../lib/jsforceExt');
 const routeErrorHandler = require('../../lib/route-error-handler');
 const Debug = require('../../lib/debug');
-const Salesforce = require('../../lib/salesforce');
 
 let _debug = new Debug('CLASSES');
 let router = express.Router();

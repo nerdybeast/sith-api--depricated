@@ -3,7 +3,6 @@
 const jwt = require('express-jwt');
 const debug = require('debug')('api index');
 const rollbar = require('rollbar');
-const JsforceExt = require('../lib/jsforceExt');
 const contentNegotiation = require('../lib/content-negotiation');
 const Salesforce = require('../lib/salesforce');
 
@@ -52,7 +51,6 @@ let RoutesCore = function(app) {
             orgId: req.headers.orgid
         }; 
 
-        app.set('jExt', new JsforceExt(connectionDetails, profile, io));
         app.set('sf', new Salesforce(connectionDetails, profile, io));
 
         //Turn this query param into a solid boolean
