@@ -80,8 +80,21 @@ router.route('/:traceFlagId').patch(function(req, res, next) {
             return res.send(traceFlagDoc);
 
         }).catch(error => {
-            let exception = new Error(error.message || 'Unknown error occurred during trace flag update.');
+
+            let detail;
+            switch(error.errorCode) {
+                case 'INVALID_ID_FIELD':
+                    detail = 'This trace flag no longer exists in the current org.';
+                    break;
+                default:
+                    detail = error.message || 'Unknown error occurred during trace flag update.';
+                    break;
+            }
+
+            let exception = new Error(detail);
             exception.title = 'Failed to update trace flag';
+            exception.errorCode = error.errorCode;
+            exception.stackTrace = error.stack;
             return next(exception);
         });
 
@@ -96,6 +109,17 @@ router.route('/:traceFlagId').patch(function(req, res, next) {
         });
 
     }).catch(error => {
+        
+        //This error code seems to mean that the trace flag for which we are trying to delete has already been deleted on the server.
+        if(error.errorCode === 'INVALID_CROSS_REFERENCE_KEY') {
+            return res.send({
+                meta: {
+                    id: req.params.traceFlagId,
+                    success: true
+                }
+            });
+        }
+
         return next(error);
     });
 
